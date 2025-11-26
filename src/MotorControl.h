@@ -18,7 +18,7 @@ class Motor {
     float getTargetRPM();
 
     int minPWM = 15;
-    float maxRPM = 120;  // 你可依實測修改
+    float maxRPM = 120;  
 
   private:
     int _pwmPin, _in1, _in2, _enca, _encb;
@@ -28,7 +28,6 @@ class Motor {
     unsigned long lastTime;
     long lastCount;
     int pwmValue;
-
     float targetRPM;
     PIDController _pid;
 };

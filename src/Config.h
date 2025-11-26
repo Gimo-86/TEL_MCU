@@ -8,22 +8,30 @@ static const uint32_t SBUS_BAUD = 100000;
 // Enable motor output?
 static const bool ENABLE_MOTOR_OUTPUT = true;
 
-// Motor pins
+// Motor pins 1: Front Left, 2: Front Right, 3: Rear Left, 4: Rear Right
 static const uint8_t MOTOR1_PWM_PIN  = 2;
 static const uint8_t MOTOR1_DIR_PIN  = 3;
 static const uint8_t MOTOR1_DIR1_PIN = 4;
+static const uint8_t FL_ENA = 42;
+static const uint8_t FL_ENB = 39;
 
 static const uint8_t MOTOR2_PWM_PIN  = 5;
 static const uint8_t MOTOR2_DIR_PIN  = 6;
 static const uint8_t MOTOR2_DIR1_PIN = 7;
+static const uint8_t FR_ENA = 40;
+static const uint8_t FR_ENB = 38;
 
 static const uint8_t MOTOR3_PWM_PIN  = 9;
 static const uint8_t MOTOR3_DIR_PIN  = 31;
 static const uint8_t MOTOR3_DIR1_PIN = 10;
+static const uint8_t RL_ENA = 41;
+static const uint8_t RL_ENB = 37;
 
 static const uint8_t MOTOR4_PWM_PIN  = 11;
 static const uint8_t MOTOR4_DIR_PIN  = 13;
 static const uint8_t MOTOR4_DIR1_PIN = 12;
+static const uint8_t RR_ENA = 38;
+static const uint8_t RR_ENB = 36;
 
 // SBUS channel to control motors
 // Note: parser provides `ch[]` as zero-based indexes: CH1 -> ch[0], CH2 -> ch[1], etc.

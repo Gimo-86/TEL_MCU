@@ -5,10 +5,10 @@
 class MotorSystem {
 public:
     MotorSystem::MotorSystem()
-        : FL(MOTOR1_PWM_PIN, MOTOR1_DIR_PIN, MOTOR1_DIR1_PIN, , , ),
-          FR(),
-          RL(),
-          RR()
+        : FL(MOTOR1_PWM_PIN, MOTOR1_DIR_PIN, MOTOR1_DIR1_PIN, FL_ENA, FL_ENB, PID_FL_KP, PID_FL_KI, PID_FL_KD),
+          FR(MOTOR2_PWM_PIN, MOTOR2_DIR_PIN, MOTOR2_DIR1_PIN, FR_ENA, FR_ENB, PID_FR_KP, PID_FR_KI, PID_FR_KD),
+          RL(MOTOR3_PWM_PIN, MOTOR3_DIR_PIN, MOTOR3_DIR1_PIN, RL_ENA, RL_ENB, PID_RL_KP, PID_RL_KI, PID_RL_KD),
+          RR(MOTOR4_PWM_PIN, MOTOR4_DIR_PIN, MOTOR4_DIR1_PIN, RR_ENA, RR_ENB, PID_RR_KP, PID_RR_KI, PID_RR_KD)
     {}
 
     void initMecanum() {
@@ -71,4 +71,4 @@ private:
     Motor FR;
     Motor RL;
     Motor RR;
-}
+};
