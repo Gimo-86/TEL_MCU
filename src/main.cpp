@@ -17,7 +17,7 @@ void setup() {
     Serial2.begin(SBUS_BAUD, SERIAL_8E2);
     Serial2.setTimeout(5);
 
-    motorSystem.initMecanum();  // initializr mecanum motor control
+    motorSystem.initMecanum();  // initialize mecanum motor control
     initActuator();             // initialize actuator control and pins
     initElevation();            // initialize elevation motor
     initFireMotors();           // initialize firing motor outputs

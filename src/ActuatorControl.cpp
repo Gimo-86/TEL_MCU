@@ -68,7 +68,7 @@ bool startFireCycle() {
     stateStartMs = millis();
     lastErr[0] = '\0';
 
-    actuatorDrive(ACT_POWER);   // begin retracting
+    actuatorDrive(-ACT_POWER);  // begin retracting (negative direction)
     return true;
 }
 

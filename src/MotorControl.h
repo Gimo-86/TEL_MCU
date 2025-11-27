@@ -22,7 +22,6 @@ class Motor {
     void setTargetRPM(float target);
     void updateEncoder();        // ISR callback for encoder
     void updateControl();
-    void updateEncoder1();       // ISR callback for one phase encoder
     float getRPM();
     int getPWM();
     float getTargetRPM();
