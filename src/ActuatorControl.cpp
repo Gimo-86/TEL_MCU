@@ -50,9 +50,9 @@ void initActuator() {
     pinMode(ACTUATOR_EN_R, OUTPUT);
 
     actuatorDrive(ACT_POWER);
-    delay(3000);
+    delay(4000);
     actuatorDrive(-ACT_POWER);
-    delay(1500);
+    delay(2550);
     actuatorStopMotor();
 
     state = ActState::Idle;
@@ -85,7 +85,7 @@ void updateActuator() {
     // Retracting
     // ----------------------------------
     if (state == ActState::Retracting) {
-        if (now - stateStartMs >= 1600) {
+        if (now - stateStartMs >= 2750) {
             actuatorStopMotor();
             state = ActState::DelayBeforeExtend;
             stateStartMs = now;
@@ -118,7 +118,7 @@ void updateActuator() {
     // Extending
     // ----------------------------------
     if (state == ActState::Extending) {
-        if (now - stateStartMs >= 1500) {
+        if (now - stateStartMs >= 2550) {
             actuatorStopMotor();
             busy = false;
             state = ActState::Idle;

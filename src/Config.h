@@ -43,7 +43,7 @@ static const uint8_t MOTOR2_DIR1_PIN = 25;
 static const uint8_t FR_ENA = 3;
 
 static const uint8_t MOTOR3_PWM_PIN  = 6;
-static const uint8_t MOTOR3_DIR_PIN  = 26;
+static const uint8_t MOTOR3_DIR_PIN  = 26;    
 static const uint8_t MOTOR3_DIR1_PIN = 27;
 static const uint8_t RL_ENA = 18;
 
@@ -110,9 +110,9 @@ static const uint16_t FIRE_THRESHOLD = 992;
 
 // Linear actuator wiring (adjust pins to match your hardware)
 // NOTE: choose PWM-capable pin for ACTUATOR_PWM_PIN if you want speed control.
-static const uint8_t ACTUATOR_PWR_R_PIN   = 8;    // Power pin for actuator motor driver
+static const uint8_t ACTUATOR_PWR_R_PIN   = 9;    // Power pin for actuator motor driver
 static const uint8_t ACTUATOR_EN_R        = 31;   // direction pin Retrection
-static const uint8_t ACTUATOR_PWR_E_PIN   = 9;    // Power pin for actuator motor driver Extension
+static const uint8_t ACTUATOR_PWR_E_PIN   = 10;    // Power pin for actuator motor driver Extension
 static const uint8_t ACTUATOR_EN_E        = 32;   // direction pin Extension
 
 
@@ -121,8 +121,8 @@ static const uint32_t ACT_MOVE_TIMEOUT_MS = 8000; // ms timeout for a single ext
 static const uint8_t  ACT_POWER           = 1;    // Power ON
 
 // Fire motors (two 775 brushed motors) — powered when AIMING is ON
-static const uint8_t FIRE_MOTOR1_PWM_PIN  = 10;   // PWM pin for first firing motor
-static const uint8_t FIRE_MOTOR2_PWM_PIN  = 11;   // PWM pin for second firing motor
+static const uint8_t FIRE_MOTOR1_PWM_PIN  = 11;   // PWM pin for first firing motor
+static const uint8_t FIRE_MOTOR2_PWM_PIN  = 12;   // PWM pin for second firing motor
 static const uint8_t FIRE_MOTOR1_DIR_PIN1 = 33;
 static const uint8_t FIRE_MOTOR1_DIR_PIN2 = 34;
 static const uint8_t FIRE_MOTOR2_DIR_PIN1 = 35;
