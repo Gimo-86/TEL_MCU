@@ -41,7 +41,11 @@ void Motor::setTargetRPM(float target) {
 }
 
 void Motor::updateEncoder() {
-  dir = abs(targetRPM) / targetRPM;
+  if (targetRPM == 0) {
+    dir = 0;
+  } else {
+    dir = (targetRPM > 0) ? 1 : -1;
+  }
   if (prevDir != dir && dir != 0) {
     pulseCount = 0;  // Reset pulse count on direction change
     lastCount = 0;
@@ -64,7 +68,11 @@ void Motor::updateControl() {
     /* 計算 RPM */
     float ppr = ENCODER_PPR;                       // 由 Config.h 設定  
     float rawRPM = (countDiff / ppr) * (60.0 / dt);
-    rpm = rawRPM * abs(targetRPM) / targetRPM;     // 讓 RPM 偵測值帶有方向
+    if (targetRPM == 0) {
+      rpm = 0;
+    } else {
+      rpm = rawRPM * ((targetRPM > 0) ? 1 : -1);   // 讓 RPM 偵測值帶有方向
+    }
 
     /* PID 控制 */
     float output = _pid.compute(targetRPM, rpm, dt);
