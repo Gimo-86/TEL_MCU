@@ -40,14 +40,10 @@ void Motor::setTargetRPM(float target) {
   this->targetRPM = target;
 }
 
+//Called from ISR - Single phase encoder
 void Motor::updateEncoder() {
-  dir = abs(targetRPM) / targetRPM;
-  if (prevDir != dir && dir != 0) {
-    pulseCount = 0;  // Reset pulse count on direction change
-    lastCount = 0;
-  }
-  prevDir = dir;
-  pulseCount += dir;
+  pulseCount++;
+  // Direction is later determined in updateControl based on targetRPM sign.
 }
 
 
@@ -61,10 +57,16 @@ void Motor::updateControl() {
     lastCount = pulseCount;
     lastTime = now;
 
-    /* 計算 RPM */
+    /* 計算 RPM - single phase encoder only counts up */
     float ppr = ENCODER_PPR;                       // 由 Config.h 設定  
     float rawRPM = (countDiff / ppr) * (60.0 / dt);
-    rpm = rawRPM * abs(targetRPM) / targetRPM;     // 讓 RPM 偵測值帶有方向
+    
+    /* Apply direction from targetRPM sign */
+    if (targetRPM < 0) {
+      rpm = -rawRPM;  // Negative RPM when motor commanded reverse
+    } else {
+      rpm = rawRPM;   // Positive RPM when motor commanded forward
+    }
 
     /* PID 控制 */
     float output = _pid.compute(targetRPM, rpm, dt);
@@ -99,6 +101,7 @@ void Motor::updateControl() {
   }
 }
 
+//Functions for debugging
 float Motor::getRPM() { return rpm; }
 int Motor::getPWM() { return pwmValue; }
 float Motor::getTargetRPM() { return targetRPM; }

@@ -30,14 +30,14 @@ void setElevationFromChannel(uint16_t chValue) {
         int speed = map((int)chValue, SBUS_NEUTRAL + ELEVATION_DEADZONE, 1792, 0, ELEVATION_POWER_LEVEL);
         speed = constrain(speed, 0, ELEVATION_POWER_LEVEL);
         // DIR HIGH increases angle
-        digitalWrite(ELEVATION_DIR_PIN, LOW);
+        digitalWrite(ELEVATION_DIR_PIN, HIGH);
         driveElevation(speed);
     }
     else if (chValue <= SBUS_NEUTRAL - ELEVATION_DEADZONE) {
         int speed = map((int)chValue, 192, SBUS_NEUTRAL - ELEVATION_DEADZONE, ELEVATION_POWER_LEVEL, 0);
         speed = constrain(speed, 0, ELEVATION_POWER_LEVEL);
         // DIR LOW decreases angle
-        digitalWrite(ELEVATION_DIR_PIN, HIGH);
+        digitalWrite(ELEVATION_DIR_PIN, LOW);
         driveElevation(speed);
     }
     else {
