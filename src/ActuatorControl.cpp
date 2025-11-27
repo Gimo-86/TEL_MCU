@@ -36,7 +36,7 @@ static void actuatorDrive(int dir) {
 }
 
 
-static void actuatorStopMotor() {
+void actuatorStopMotor() {
     digitalWrite(ACTUATOR_EN_E, LOW);
     digitalWrite(ACTUATOR_EN_R, LOW);
     digitalWrite(ACTUATOR_PWR_E_PIN, LOW);

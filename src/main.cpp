@@ -9,20 +9,13 @@
 
 SbusParser sbus;
 
-// ==== 各馬達 PID 預設 ====
-PIDController pidFL(PID_FL_KP, PID_FL_KI, PID_FL_KD);
-PIDController pidFR(PID_FR_KP, PID_FR_KI, PID_FR_KD);
-PIDController pidRL(PID_RL_KP, PID_RL_KI, PID_RL_KD);
-PIDController pidRR(PID_RR_KP, PID_RR_KI, PID_RR_KD);
-
-
 // ==== 馬達系統物件 ====
 MotorSystem motorSystem;  
 
 void setup() {
     Serial.begin(USB_BAUD);
-    Serial1.begin(SBUS_BAUD, SERIAL_8E2);
-    Serial1.setTimeout(5);
+    Serial2.begin(SBUS_BAUD, SERIAL_8E2);
+    Serial2.setTimeout(5);
 
     motorSystem.initMecanum();  // initializr mecanum motor control
     initActuator();             // initialize actuator control and pins
@@ -34,14 +27,14 @@ void setup() {
 
 void loop() {
 
-    if (!Serial1.available()) return;
+    if (!Serial2.available()) return;
 
-    if (Serial1.read() != 0x0F) return;
+    if (Serial2.read() != 0x0F) return;
 
     uint8_t frame[25];
     frame[0] = 0x0F;
 
-    if (Serial1.readBytes(frame + 1, 24) != 24) return;
+    if (Serial2.readBytes(frame + 1, 24) != 24) return;
     if (frame[24] != 0x00) return;
 
     uint16_t ch[16];

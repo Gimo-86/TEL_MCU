@@ -5,6 +5,8 @@
 // Global motor instances array for ISR access
 Motor* motorInstances[4] = {nullptr, nullptr, nullptr, nullptr};
 static uint8_t motorCount = 0;
+static int dir = 1;
+static int prevDir = 0;
 
 // Static ISR handlers
 void motorISR0() { if(motorInstances[0]) motorInstances[0]->updateEncoder(); }
@@ -14,9 +16,9 @@ void motorISR3() { if(motorInstances[3]) motorInstances[3]->updateEncoder(); }
 
 static void (*isrHandlers[4])() = {motorISR0, motorISR1, motorISR2, motorISR3};
 
-Motor::Motor(int pwmPin, int in1, int in2, int enca, int encb, float kp, float ki, float kd)
-  : _pwmPin(pwmPin), _in1(in1), _in2(in2), _enca(enca), _encb(encb), _pid(kp, ki, kd),
-    pulseCount(0), rotationDir(1), rpm(0), pwmValue(0),
+Motor::Motor(int pwmPin, int in1, int in2, int enca, float kp, float ki, float kd)
+  : _pwmPin(pwmPin), _in1(in1), _in2(in2), _enca(enca), _pid(kp, ki, kd),
+    pulseCount(0), rpm(0), pwmValue(0),
     targetRPM(0), lastCount(0), lastTime(0) {}
 
 void Motor::begin() {
@@ -24,7 +26,6 @@ void Motor::begin() {
   pinMode(_in1, OUTPUT);
   pinMode(_in2, OUTPUT);
   pinMode(_enca, INPUT_PULLUP);
-  pinMode(_encb, INPUT_PULLUP);
   analogWrite(_pwmPin, 0);
   
   // Register this motor instance for ISR access
@@ -36,21 +37,19 @@ void Motor::begin() {
 }
 
 void Motor::setTargetRPM(float target) {
-  targetRPM = target;
+  this->targetRPM = target;
 }
 
 void Motor::updateEncoder() {
-  int stateA = digitalRead(_enca);
-  int stateB = digitalRead(_encb);
-  rotationDir = (stateA == stateB) ? 1 : -1;
-  pulseCount += rotationDir;
+  dir = abs(targetRPM) / targetRPM;
+  if (prevDir != dir && dir != 0) {
+    pulseCount = 0;  // Reset pulse count on direction change
+    lastCount = 0;
+  }
+  prevDir = dir;
+  pulseCount += dir;
 }
-void Motor::updateEncoderR() {
-  int stateA = digitalRead(_enca);
-  int stateB = digitalRead(_encb);
-  rotationDir = (stateA == stateB) ? -1 : 1;
-  pulseCount += rotationDir;
-}
+
 
 void Motor::updateControl() {
   unsigned long now = millis();
@@ -63,9 +62,9 @@ void Motor::updateControl() {
     lastTime = now;
 
     /* 計算 RPM */
-    float ppr = ENCODER_PPR;       // 由 Config.h 設定  
+    float ppr = ENCODER_PPR;                       // 由 Config.h 設定  
     float rawRPM = (countDiff / ppr) * (60.0 / dt);
-    rpm = rawRPM * rotationDir;     // 讓 RPM 偵測值帶有方向
+    rpm = rawRPM * abs(targetRPM) / targetRPM;     // 讓 RPM 偵測值帶有方向
 
     /* PID 控制 */
     float output = _pid.compute(targetRPM, rpm, dt);
