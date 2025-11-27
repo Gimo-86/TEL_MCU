@@ -15,21 +15,19 @@ PIDController pidFR(PID_FR_KP, PID_FR_KI, PID_FR_KD);
 PIDController pidRL(PID_RL_KP, PID_RL_KI, PID_RL_KD);
 PIDController pidRR(PID_RR_KP, PID_RR_KI, PID_RR_KD);
 
-// ==== 各馬達物件 ====
-Motor motorFL(MOTOR1_PWM_PIN, MOTOR1_DIR_PIN, MOTOR1_DIR1_PIN, 22, 23, PID_FL_KP, PID_FL_KI, PID_FL_KD); // Front Left
-Motor motorFR(MOTOR2_PWM_PIN, MOTOR2_DIR_PIN, MOTOR2_DIR1_PIN, 24, 25, PID_FR_KP, PID_FR_KI, PID_FR_KD); // Front Right
-Motor motorRL(MOTOR3_PWM_PIN, MOTOR3_DIR_PIN, MOTOR3_DIR1_PIN, 26, 27, PID_RL_KP, PID_RL_KI, PID_RL_KD); // Rear Left
-Motor motorRR(MOTOR4_PWM_PIN, MOTOR4_DIR_PIN, MOTOR4_DIR1_PIN, 28, 29, PID_RR_KP, PID_RR_KI, PID_RR_KD); // Rear Right    
+
+// ==== 馬達系統物件 ====
+MotorSystem motorSystem;  
 
 void setup() {
     Serial.begin(USB_BAUD);
     Serial1.begin(SBUS_BAUD, SERIAL_8E2);
     Serial1.setTimeout(5);
 
-    initMecanum();  // 一定要初始化馬達
-    initActuator(); // initialize actuator control and pins
-    initElevation(); // initialize elevation motor
-    initFireMotors(); // initialize firing motor outputs
+    motorSystem.initMecanum();  // initializr mecanum motor control
+    initActuator();             // initialize actuator control and pins
+    initElevation();            // initialize elevation motor
+    initFireMotors();           // initialize firing motor outputs
 
     Serial.println("SBUS + Mecanum Ready");
 }
@@ -61,10 +59,10 @@ void loop() {
         aimingState = newAiming;
         if (aimingState) {
             Serial.println("AIM: ON");
-            setFireMotors(false); // power firing motors when aiming off
+            setFireMotors(false);   // Stop firing motors when aiming on
         } else {
             Serial.println("AIM: OFF");
-            setFireMotors(true); // cut power when aiming on
+            setFireMotors(true);    // Start firing motors when aiming off
         }
     }
 
@@ -89,8 +87,8 @@ void loop() {
     // CH3 -> elevation control (continuous)
     setElevationFromChannel(ch[CH_ELEVATE]);
 
-    // ⭐ 這裡是真的在控制馬達（CH2 + CH4）
-    mecanumDrive(
+    // ⭐ 實際控制馬達（CH2 + CH4）
+    motorSystem.mecanumDrive(
         ch[CH_FORWARD_BACKWARD],     // 你的油門
         ch[CH_STRAFE_LEFT_RIGHT],    // 左右平移
         ch[CH_ROTATE]                // 旋轉由 CH1 控制

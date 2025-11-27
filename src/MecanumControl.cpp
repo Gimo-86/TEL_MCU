@@ -1,3 +1,4 @@
+#pragma once
 #include "MecanumControl.h"
 #include "MotorControl.h"
 #include "Config.h"
@@ -43,9 +44,9 @@ public:
             return map(value, 192, 1792, -255, 255);
         };
 
-        int Vx = norm(ch2);     // 前後
-        int Vy = norm(ch4);     // 左右
-        int W  = norm(chRotate); // 旋轉（現在用 0）
+        int Vx = norm(ch2);         // 前後
+        int Vy = norm(ch4);         // 左右
+        int W  = norm(chRotate);    // 旋轉（現在用 0）
 
         // 麥克納姆四輪解算
         int m1 = Vx + Vy + W;
@@ -64,6 +65,11 @@ public:
         FR.setTargetRPM(m2);
         RL.setTargetRPM(m3);
         RR.setTargetRPM(m4);
+
+        FL.updateControl();
+        FR.updateControl();
+        RL.updateControl();
+        RR.updateControl();
     }
 
 private:

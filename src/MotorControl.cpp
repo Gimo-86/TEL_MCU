@@ -2,6 +2,18 @@
 #include "PIDController.h"
 #include "Config.h"
 
+// Global motor instances array for ISR access
+Motor* motorInstances[4] = {nullptr, nullptr, nullptr, nullptr};
+static uint8_t motorCount = 0;
+
+// Static ISR handlers
+void motorISR0() { if(motorInstances[0]) motorInstances[0]->updateEncoder(); }
+void motorISR1() { if(motorInstances[1]) motorInstances[1]->updateEncoder(); }
+void motorISR2() { if(motorInstances[2]) motorInstances[2]->updateEncoder(); }
+void motorISR3() { if(motorInstances[3]) motorInstances[3]->updateEncoder(); }
+
+static void (*isrHandlers[4])() = {motorISR0, motorISR1, motorISR2, motorISR3};
+
 Motor::Motor(int pwmPin, int in1, int in2, int enca, int encb, float kp, float ki, float kd)
   : _pwmPin(pwmPin), _in1(in1), _in2(in2), _enca(enca), _encb(encb), _pid(kp, ki, kd),
     pulseCount(0), rotationDir(1), rpm(0), pwmValue(0),
@@ -14,6 +26,13 @@ void Motor::begin() {
   pinMode(_enca, INPUT_PULLUP);
   pinMode(_encb, INPUT_PULLUP);
   analogWrite(_pwmPin, 0);
+  
+  // Register this motor instance for ISR access
+  if (motorCount < 4) {
+    motorInstances[motorCount] = this;
+    attachInterrupt(digitalPinToInterrupt(_enca), isrHandlers[motorCount], CHANGE);
+    motorCount++;
+  }
 }
 
 void Motor::setTargetRPM(float target) {

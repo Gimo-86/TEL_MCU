@@ -12,26 +12,26 @@ static const bool ENABLE_MOTOR_OUTPUT = true;
 static const uint8_t MOTOR1_PWM_PIN  = 2;
 static const uint8_t MOTOR1_DIR_PIN  = 3;
 static const uint8_t MOTOR1_DIR1_PIN = 4;
-static const uint8_t FL_ENA = 42;
-static const uint8_t FL_ENB = 39;
+static const uint8_t FL_ENA = 22;
+static const uint8_t FL_ENB = 23;
 
 static const uint8_t MOTOR2_PWM_PIN  = 5;
 static const uint8_t MOTOR2_DIR_PIN  = 6;
 static const uint8_t MOTOR2_DIR1_PIN = 7;
-static const uint8_t FR_ENA = 40;
-static const uint8_t FR_ENB = 38;
+static const uint8_t FR_ENA = 24;
+static const uint8_t FR_ENB = 25;
 
 static const uint8_t MOTOR3_PWM_PIN  = 9;
 static const uint8_t MOTOR3_DIR_PIN  = 31;
 static const uint8_t MOTOR3_DIR1_PIN = 10;
-static const uint8_t RL_ENA = 41;
-static const uint8_t RL_ENB = 37;
+static const uint8_t RL_ENA = 26;
+static const uint8_t RL_ENB = 27;
 
 static const uint8_t MOTOR4_PWM_PIN  = 11;
 static const uint8_t MOTOR4_DIR_PIN  = 13;
 static const uint8_t MOTOR4_DIR1_PIN = 12;
-static const uint8_t RR_ENA = 38;
-static const uint8_t RR_ENB = 36;
+static const uint8_t RR_ENA = 28;
+static const uint8_t RR_ENB = 29;
 
 // SBUS channel to control motors
 // Note: parser provides `ch[]` as zero-based indexes: CH1 -> ch[0], CH2 -> ch[1], etc.
@@ -95,11 +95,6 @@ static const uint8_t ACTUATOR_EN_R          = 43;   // direction pin Retrection
 static const uint8_t ACTUATOR_PWR_E_PIN     = 39;   // Power pin for actuator motor driver Extension
 static const uint8_t ACTUATOR_EN_E          = 38;   // direction pin Extension
 
-
-// Limit switches (wired so that ACTIVE == LOW). Adjust if your switches are active HIGH.
-static const uint8_t ACT_LIMIT_EXT_PIN    = 22;   // limit switch for fully extended
-static const uint8_t ACT_LIMIT_RET_PIN    = 23;   // limit switch for fully retracted
-static const bool ACT_LIMIT_ACTIVE_LOW    = true; // true if switch reads LOW when triggered
 
 // Actuator safety/timeouts
 static const uint32_t ACT_MOVE_TIMEOUT_MS = 8000; // ms timeout for a single extend/retract

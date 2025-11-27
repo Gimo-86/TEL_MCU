@@ -1,7 +1,7 @@
 #include "ActuatorControl.h"
 #include "Config.h"
 
-enum class ActState { Idle, Retracting, DelayBeforeExtend, Extending, Error };
+enum class ActState { Zeroing, Idle, Retracting, DelayBeforeExtend, Extending, Error };
 
 static ActState state = ActState::Idle;
 static uint32_t stateStartMs = 0;
@@ -49,10 +49,12 @@ void initActuator() {
     pinMode(ACTUATOR_PWR_R_PIN, OUTPUT);
     pinMode(ACTUATOR_EN_R, OUTPUT);
 
-    pinMode(ACT_LIMIT_EXT_PIN, INPUT_PULLUP);
-    pinMode(ACT_LIMIT_RET_PIN, INPUT_PULLUP);
-
+    actuatorDrive(ACT_POWER);
+    delay(3000);
+    actuatorDrive(-ACT_POWER);
+    delay(1500);
     actuatorStopMotor();
+
     state = ActState::Idle;
     busy = false;
     lastErr[0] = '\0';

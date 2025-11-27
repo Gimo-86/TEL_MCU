@@ -4,15 +4,25 @@
 #include <Arduino.h>
 #include "PIDController.h"
 
+// Forward declaration for interrupt handlers
+class Motor;
+extern Motor* motorInstances[4];
+
+// ISR handlers (static functions)
+void motorISR0();
+void motorISR1();
+void motorISR2();
+void motorISR3();
+
 class Motor {
   public:
     Motor(int pwmPin, int in1, int in2, int enca, int encb, float kp, float ki, float kd);
 
     void begin();
     void setTargetRPM(float target);
-    void updateEncoder();
+    void updateEncoder();        // ISR callback for encoder
     void updateControl();
-    void updateEncoderR();
+    void updateEncoderR();       // ISR callback for reverse-mounted encoder
     float getRPM();
     int getPWM();
     float getTargetRPM();
