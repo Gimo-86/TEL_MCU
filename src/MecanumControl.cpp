@@ -28,27 +28,31 @@ MotorSystem::MotorSystem()
 void MotorSystem::mecanumDrive(int ch2, int ch4, int chRotate) {
 
     // SBUS 992 是中立
-    auto norm = [](int value) {
-        return map(value, 192, 1792, -255, 255);
+    auto norm = [](int value) -> float {
+        // map SBUS (approx 192..1792) to -CONFIG_MAX_RPM .. +CONFIG_MAX_RPM
+        const float inMin = 192.0f;
+        const float inMax = 1792.0f;
+        float t = (float(value) - inMin) / (inMax - inMin);
+        return (t * 2.0f - 1.0f) * CONFIG_MAX_RPM;
     };
 
-    int Vx = norm(ch2);         // 前後
-    int Vy = norm(ch4);         // 左右
-    int W  = norm(chRotate);    // 旋轉（現在用 0）
+    float Vx = norm(ch2);         // 前後 (RPM)
+    float Vy = norm(ch4);         // 左右 (RPM)
+    float W  = norm(chRotate);    // 旋轉 (RPM)
 
     // 麥克納姆四輪解算
-    int m1 = Vx + Vy + W;
-    int m2 = Vx - Vy - W;
-    int m3 = Vx - Vy + W;
-    int m4 = Vx + Vy - W;
+    float m1 = Vx + Vy + W;
+    float m2 = Vx - Vy - W;
+    float m3 = Vx - Vy + W;
+    float m4 = Vx + Vy - W;
 
-    // 限幅
-    m1 = constrain(m1, -255, 255);
-    m2 = constrain(m2, -255, 255);
-    m3 = constrain(m3, -255, 255);
-    m4 = constrain(m4, -255, 255);
+    // 限幅到最大轉速範圍
+    m1 = constrain(m1, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
+    m2 = constrain(m2, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
+    m3 = constrain(m3, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
+    m4 = constrain(m4, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
 
-    // 輸出到馬達
+    // 直接以 RPM 為目標值輸出到馬達 PID
     FL.setTargetRPM(m1);
     FR.setTargetRPM(m2);
     RL.setTargetRPM(m3);

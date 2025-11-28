@@ -28,7 +28,7 @@ class Motor {
     int getPWM();
     float getTargetRPM();
 
-    int minPWM = 15;
+    int minPWM = 30;
     float maxRPM = 120;  
 
   private:

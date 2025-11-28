@@ -33,8 +33,8 @@ static const bool ENABLE_MOTOR_OUTPUT = true;
 
 // Motor pins 1: Front Left, 2: Front Right, 3: Rear Left, 4: Rear Right
 static const uint8_t MOTOR1_PWM_PIN  = 4;
-static const uint8_t MOTOR1_DIR_PIN  = 22;
-static const uint8_t MOTOR1_DIR1_PIN = 23;
+static const uint8_t MOTOR1_DIR_PIN  = 37; // 22 buggy
+static const uint8_t MOTOR1_DIR1_PIN = 38; // 23 buggy
 static const uint8_t FL_ENA = 2;
 
 static const uint8_t MOTOR2_PWM_PIN  = 5;
@@ -48,12 +48,14 @@ static const uint8_t MOTOR3_DIR1_PIN = 27;
 static const uint8_t RL_ENA = 18;
 
 static const uint8_t MOTOR4_PWM_PIN  = 7;
-static const uint8_t MOTOR4_DIR_PIN  = 28;
-static const uint8_t MOTOR4_DIR1_PIN = 29;
+static const uint8_t MOTOR4_DIR_PIN  = 29;
+static const uint8_t MOTOR4_DIR1_PIN = 28;
 static const uint8_t RR_ENA = 19;
+
 
 // SBUS channel to control motors
 // Note: parser provides `ch[]` as zero-based indexes: CH1 -> ch[0], CH2 -> ch[1], etc.
+
 static const uint8_t CH_ROTATE = 0;              // CH1: rotate left / right (yaw)
 static const uint8_t CH_FORWARD_BACKWARD = 1;    // CH2: forward / backward (throttle)
 static const uint8_t CH_STRAFE_LEFT_RIGHT = 3;   // CH4: strafe left / right
@@ -64,46 +66,45 @@ static const uint8_t CH_ELEVATE = 2;             // CH3: barrel elevation contro
 // Elevation control parameters
 static const uint8_t ELEVATION_PWM_PIN = 8;      // PWM pin for elevation motor driver (change to your wiring)
 static const uint8_t ELEVATION_DIR_PIN = 30;     // DIR pin for elevation motor driver (HIGH=increase angle)
-static const uint8_t ELEVATION_POWER_LEVEL = 255;// default max PWM (0..255)
+static const uint8_t ELEVATION_POWER_LEVEL = 250;// default max PWM (0..255)
 static const uint16_t ELEVATION_DEADZONE = 8;    // treat within ±deadzone around NEUTRAL as stop
 static const uint16_t SBUS_NEUTRAL = 992;        // neutral value for SBUS channels
 
-// You can add inversion flags or deadzone thresholds here if needed
-// Aiming (CH6)
-// CH6 -> ch[5]
-static const uint8_t CH_AIMING = 5;               // CH6: aiming switch
-// Threshold to decide ON/OFF for a switch channel (SBUS values range ~192..1792)
-static const uint16_t AIMING_THRESHOLD = 992;
 // Fire (CH5) - momentary switch
 // CH5 -> ch[4]
+static const uint8_t CH_FIRE = 4;
+
+// Aiming (CH6)
+// CH6 -> ch[5]
+static const uint8_t CH_AIMING = 5;
+
 
 // Encoder / Motor closed-loop parameters
 static const float ENCODER_PPR = 1900;            // pulses per revolution (EXINT = CHANGE)
 static const int CONFIG_MIN_PWM = 15;             // minimum PWM to overcome deadzone
-static const float CONFIG_MAX_RPM = 120.0;        // max RPM mapping for motor outputs
+static const float CONFIG_MAX_RPM = 200.0;        // max RPM mapping for motor outputs
 
 // PID gains (one set per motor)
-static const float PID_FL_KP = 0.38;
-static const float PID_FL_KI = 0.0065;
-static const float PID_FL_KD = 0.038;
+static const float PID_FL_KP = 1.0;
+static const float PID_FL_KI = 0.0;
+static const float PID_FL_KD = 0.0;
 
-static const float PID_FR_KP = 0.34;
-static const float PID_FR_KI = 0.0058;
-static const float PID_FR_KD = 0.037;
+static const float PID_FR_KP = 1.0;
+static const float PID_FR_KI = 0.0;
+static const float PID_FR_KD = 0.0;
 
-static const float PID_RL_KP = 0.33;
-static const float PID_RL_KI = 0.006;
-static const float PID_RL_KD = 0.04;
+static const float PID_RL_KP = 1.0;
+static const float PID_RL_KI = 0.0 ;
+static const float PID_RL_KD = 0.0;
 
-static const float PID_RR_KP = 0.30;
-static const float PID_RR_KI = 0.006;
-static const float PID_RR_KD = 0.038;
+static const float PID_RR_KP = 1.0;
+static const float PID_RR_KI = 0.0;
+static const float PID_RR_KD = 0.0;
 
 // SBUS channel to set global RPM override (optional)
 // CH7 -> ch[6]
 static const uint8_t CH_RPM_SET = 6;
 static const uint16_t RPM_SET_DEADZONE = 20;      // small deadzone around neutral
-static const uint8_t CH_FIRE = 4;                 // CH5: momentary fire switch
 
 // Threshold: user specified 992 as baseline; when > FIRE_THRESHOLD treat as trigger
 static const uint16_t FIRE_THRESHOLD = 992;

@@ -50,6 +50,8 @@ void Motor::updateEncoder() {
 void Motor::updateControl() {
   unsigned long now = millis();
   float dt = (now - lastTime) / 1000.0;
+  int targetDir = (targetRPM >= 0) ? 1 : -1;
+  static int prevDir = targetDir;
 
   /* 更新脈波計數器 pulseCount f = 20Hz (T = 0.05s) */
   if (dt >= 0.05) {                 
@@ -62,42 +64,42 @@ void Motor::updateControl() {
     float rawRPM = (countDiff / ppr) * (60.0 / dt);
     
     /* Apply direction from targetRPM sign */
-    if (targetRPM < 0) {
-      rpm = -rawRPM;  // Negative RPM when motor commanded reverse
+    if (targetDir == prevDir) {
+      rpm = rawRPM * targetDir;     // Same direction as before
     } else {
-      rpm = rawRPM;   // Positive RPM when motor commanded forward
+      pwmValue = 0;                 // Reset PWM on direction change
+      rpm = rawRPM * -targetDir;    // Sudden direction change, assume motor is slowing down
     }
+    
 
     /* PID 控制 */
     float output = _pid.compute(targetRPM, rpm, dt);
     pwmValue += (int)output;
     pwmValue = constrain(pwmValue, -255, 255);
 
-    /* 限制 PWM 範圍 */
-    if (pwmValue > 0) 
-        pwmValue = constrain(pwmValue, minPWM, 255);
-    else if (pwmValue < 0)
-        pwmValue = constrain(pwmValue, -255, -minPWM);
-    
+
     if (targetRPM == 0) {
-        pwmValue = 0;
-        digitalWrite(_in1, LOW);
-        digitalWrite(_in2, LOW);
+      pwmValue = 0;
+      digitalWrite(_in1, LOW);
+      digitalWrite(_in2, LOW);
     }
-    else {
-      if (pwmValue > 0) {
-        pwmValue = max(pwmValue, minPWM); // 正轉死區補償
+
+    /* 限制 PWM 範圍 */
+    if (pwmValue > 0) {
+        pwmValue = constrain(pwmValue, minPWM, 255);
         digitalWrite(_in1, HIGH);
         digitalWrite(_in2, LOW);
-      } 
-      else if (pwmValue < 0) {
-        pwmValue = min(pwmValue, -minPWM); // 反轉死區補償
+    } else if (pwmValue < 0) {
+        pwmValue = constrain(pwmValue, -255, -minPWM);
         digitalWrite(_in1, LOW);
         digitalWrite(_in2, HIGH);
-      }
     }
+
     // ======實際輸出 PWM 取絕對值 ======
     analogWrite(_pwmPin, abs(pwmValue));
+
+
+    prevDir = targetDir;
   }
 }
 

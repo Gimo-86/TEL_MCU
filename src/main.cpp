@@ -45,9 +45,9 @@ void loop() {
     // Debug 可開可關
     sbus.printFrame(frame, ch, flags);
 
-    // CH6 作為 aiming 開關 (active when > AIMING_THRESHOLD)
+    // CH6 作為 aiming 開關 (active when > SBUS_NEUTRAL)
     static bool aimingState = true;
-    bool newAiming = (ch[CH_AIMING] > AIMING_THRESHOLD);
+    bool newAiming = (ch[CH_AIMING] > SBUS_NEUTRAL);
     if (newAiming != aimingState) {
         aimingState = newAiming;
         if (aimingState) {
@@ -74,11 +74,14 @@ void loop() {
     }
     prevFire = fireNow;
 
+
     // Update actuator state machine every loop
     updateActuator();
 
+
     // CH3 -> elevation control (continuous)
     setElevationFromChannel(ch[CH_ELEVATE]);
+
 
     // ⭐ 實際控制馬達（CH2 + CH4）
     motorSystem.mecanumDrive(

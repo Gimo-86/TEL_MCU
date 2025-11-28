@@ -6,9 +6,13 @@ class PIDController {
     PIDController(float kp, float ki, float kd)
       : Kp(kp), Ki(ki), Kd(kd), prevError(0), integral(0) {}
 
+    // Compute PID output
     float compute(float target, float current, float dt) {
       float error = target - current;
-      integral += error * dt;
+      // Prevent integral windup
+      if (integral < 1000 && integral > -1000) {
+        integral += error * dt;
+      }
       float derivative = (error - prevError) / dt;
       prevError = error;
       return Kp * error + Ki * integral + Kd * derivative;      
