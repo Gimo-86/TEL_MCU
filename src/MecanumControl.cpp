@@ -26,10 +26,10 @@ MotorSystem::MotorSystem()
 */
 
 void MotorSystem::mecanumDrive(int ch2, int ch4, int chRotate) {
-
+    //Serial.println("MECA");
     // SBUS 992 是中立
     auto norm = [](int value) -> float {
-        // map SBUS (approx 192..1792) to -CONFIG_MAX_RPM .. +CONFIG_MAX_RPM
+        // map SBUS (approx 192~1792) to -CONFIG_MAX_RPM .. +CONFIG_MAX_RPM
         const float inMin = 192.0f;
         const float inMax = 1792.0f;
         float t = (float(value) - inMin) / (inMax - inMin);
@@ -40,23 +40,48 @@ void MotorSystem::mecanumDrive(int ch2, int ch4, int chRotate) {
     float Vy = norm(ch4);         // 左右 (RPM)
     float W  = norm(chRotate);    // 旋轉 (RPM)
 
-    // 麥克納姆四輪解算
-    float m1 = Vx + Vy + W;
-    float m2 = Vx - Vy - W;
-    float m3 = Vx - Vy + W;
-    float m4 = Vx + Vy - W;
+    Serial.println(Vx, 4);
+    Serial.println(Vy, 4);
+    Serial.println(W, 4);
 
-    // 限幅到最大轉速範圍
+    // 麥克納姆四輪解算
+    float m1 = (Vx + Vy + W) * kFL;  // FL
+    float m2 = (Vx - Vy - W) * kFR;  // FR
+    float m3 = (Vx - Vy + W) * kRL;  // RL (無 encoder → 補償用)
+    float m4 = (Vx + Vy - W) * kRR;  // RR
+
+    // Apply per-wheel direction multipliers (in case motor wiring/polarity differs)
+    m1 *= MOTOR_FL_DIR;
+    m2 *= MOTOR_FR_DIR;
+    m3 *= MOTOR_RL_DIR;
+    m4 *= MOTOR_RR_DIR;
+
+    // 直接以 RPM 為目標值輸出到馬達 PID
+    setTargetRPMs(m1, m2, m3, m4);
+}
+
+void MotorSystem::setTargetRPMs(float m1, float m2, float m3, float m4) {
     m1 = constrain(m1, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
     m2 = constrain(m2, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
     m3 = constrain(m3, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
     m4 = constrain(m4, -CONFIG_MAX_RPM, CONFIG_MAX_RPM);
 
-    // 直接以 RPM 為目標值輸出到馬達 PID
     FL.setTargetRPM(m1);
     FR.setTargetRPM(m2);
     RL.setTargetRPM(m3);
     RR.setTargetRPM(m4);
+
+    FL.updateControl();
+    FR.updateControl();
+    RL.updateControl();
+    RR.updateControl();
+}
+
+void MotorSystem::stop() {
+    FL.setTargetRPM(0);
+    FR.setTargetRPM(0);
+    RL.setTargetRPM(0);
+    RR.setTargetRPM(0);
 
     FL.updateControl();
     FR.updateControl();

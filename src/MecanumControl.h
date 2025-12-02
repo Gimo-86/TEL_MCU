@@ -6,12 +6,17 @@ class MotorSystem {
 public:
     MotorSystem();
 
-    void initMecanum();
-    void mecanumDrive(int ch2, int ch4, int chRotate);
-    
-private:
     Motor FL;
     Motor FR;
     Motor RL;
     Motor RR;
+    
+    void initMecanum();
+    void mecanumDrive(int ch2, int ch4, int chRotate);
+    void updateAll(float dt);
+    // Directly set target RPMs for each motor (used by autopilot)
+    void setTargetRPMs(float m1, float m2, float m3, float m4);
+    void stop();
+    
+    
 };

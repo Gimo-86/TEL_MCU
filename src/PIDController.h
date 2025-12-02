@@ -14,6 +14,12 @@ class PIDController {
         integral += error * dt;
       }
       float derivative = (error - prevError) / dt;
+      
+      if (prevError == 0 && integral == 0) {
+      derivative = 0; // 第一輪 derivative 不用算
+    }
+
+      if (dt < 0.001f) dt = 0.001f;  // avoid derivative explosion
       prevError = error;
       return Kp * error + Ki * integral + Kd * derivative;      
     }

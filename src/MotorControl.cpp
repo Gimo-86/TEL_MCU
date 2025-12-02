@@ -5,8 +5,6 @@
 // Global motor instances array for ISR access
 Motor* motorInstances[4] = {nullptr, nullptr, nullptr, nullptr};
 static uint8_t motorCount = 0;
-static int dir = 1;
-static int prevDir = 0;
 
 // Static ISR handlers
 void motorISR0() { if(motorInstances[0]) motorInstances[0]->updateEncoder(); }
@@ -26,8 +24,13 @@ void Motor::begin() {
   pinMode(_in1, OUTPUT);
   pinMode(_in2, OUTPUT);
   pinMode(_enca, INPUT_PULLUP);
+
+  digitalWrite(_in1, LOW);
+  digitalWrite(_in2, LOW);
   analogWrite(_pwmPin, 0);
   
+  lastTime = millis();
+
   // Register this motor instance for ISR access
   if (motorCount < 4) {
     motorInstances[motorCount] = this;
@@ -37,7 +40,7 @@ void Motor::begin() {
 }
 
 void Motor::setTargetRPM(float target) {
-  this->targetRPM = target;
+  targetRPM = target;
 }
 
 //Called from ISR - Single phase encoder
@@ -48,16 +51,17 @@ void Motor::updateEncoder() {
 
 
 void Motor::updateControl() {
+  //Serial.println("UPDATE CONTROL");
+
   unsigned long now = millis();
-  float dt = (now - lastTime) / 1000.0;
+  float dt = (now - lastTime) / 1000.0f;
   int targetDir = (targetRPM >= 0) ? 1 : -1;
   static int prevDir = targetDir;
 
   /* 更新脈波計數器 pulseCount f = 20Hz (T = 0.05s) */
-  if (dt >= 0.05) {                 
+  if (dt >= 0.01) {                 
     long countDiff = pulseCount - lastCount;
     lastCount = pulseCount;
-    lastTime = now;
 
     /* 計算 RPM - single phase encoder only counts up */
     float ppr = ENCODER_PPR;                       // 由 Config.h 設定  
@@ -74,8 +78,8 @@ void Motor::updateControl() {
 
     /* PID 控制 */
     float output = _pid.compute(targetRPM, rpm, dt);
-    pwmValue += (int)output;
-    pwmValue = constrain(pwmValue, -255, 255);
+    pwmValue = output;
+    pwmValue = constrain(pwmValue, -(int)MAX_MOTOR_PWM, (int)MAX_MOTOR_PWM);
 
 
     if (targetRPM == 0) {
@@ -86,14 +90,20 @@ void Motor::updateControl() {
 
     /* 限制 PWM 範圍 */
     if (pwmValue > 0) {
-        pwmValue = constrain(pwmValue, minPWM, 255);
+      pwmValue = constrain(pwmValue, minPWM, (int)MAX_MOTOR_PWM);
         digitalWrite(_in1, HIGH);
         digitalWrite(_in2, LOW);
     } else if (pwmValue < 0) {
-        pwmValue = constrain(pwmValue, -255, -minPWM);
+      pwmValue = constrain(pwmValue, -((int)MAX_MOTOR_PWM), -minPWM);
         digitalWrite(_in1, LOW);
         digitalWrite(_in2, HIGH);
     }
+    else {
+    // 理論上不太會到這裡，但保險
+    digitalWrite(_in1, LOW);
+    digitalWrite(_in2, LOW);
+    analogWrite(_pwmPin, 0);
+  }
 
     // ======實際輸出 PWM 取絕對值 ======
     analogWrite(_pwmPin, abs(pwmValue));
@@ -103,7 +113,10 @@ void Motor::updateControl() {
   }
 }
 
+
 //Functions for debugging
 float Motor::getRPM() { return rpm; }
 int Motor::getPWM() { return pwmValue; }
 float Motor::getTargetRPM() { return targetRPM; }
+
+long Motor::getPulseCount() { return pulseCount; }
